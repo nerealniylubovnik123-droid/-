@@ -1,0 +1,23 @@
+{
+  "lullabies": [
+    {
+      "title": "Колыбельная — Брамс (шкатулка)",
+      "file": "assets/lullabies/brahms_musicbox.mp3"
+    },
+    "assets/lullabies/moonlight.mp3"
+  ],
+  "tales": [
+    {
+      "title": "Колобок",
+      "file": "assets/tales/kolobok.mp3"
+    },
+    "assets/tales/repka.mp3"
+  ],
+  "noise": [
+    {
+      "title": "Дождь на крыше",
+      "file": "assets/noise/rain_roof.mp3"
+    },
+    "assets/noise/forest_night.mp3"
+  ]
+}

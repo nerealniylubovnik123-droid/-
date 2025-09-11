@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Baby Sleep+ — JSON Noise</title>
+<meta name="theme-color" content="#0b0f18">
+<style>
+  :root{
+    --bg0:#070a10; --bg1:#0b0f18; --bg2:#0e1420;
+    --card:#0f1522; --line:#1a2434; --text:#eaf0ff; --muted:#9bb0c7;
+    --acc:#00c2b3; --acc2:#67fff3; --danger:#ff4d6d;
+    --shadow:0 18px 50px rgba(0,0,0,.55);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0; color:var(--text); font:16px/1.45 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+        background:
+          radial-gradient(900px 600px at 85% -10%, rgba(25,60,80,.35), transparent 60%),
+          radial-gradient(800px 500px at 15% 120%, rgba(0,194,179,.18), transparent 65%),
+          linear-gradient(180deg, var(--bg0), var(--bg1) 40%, var(--bg2));}
+  .wrap{max-width:420px; margin:0 auto; padding:12px 12px 28px}
+  .header{display:flex;align-items:center;gap:10px;margin:6px 0 16px}
+  .logo{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.3px}
+  .logo .bubble{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(180deg,#1fead9,#00b3a4);color:#052622;box-shadow:0 10px 24px rgba(0,179,164,.35);border:1px solid #0ab3a7}
+  .logo .title{font-size:18px}
+  .spacer{flex:1}
+  .gear{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:#0f1523;display:grid;place-items:center;cursor:pointer}
+  .tiles{display:grid; gap:12px}
+  .tile{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);cursor:pointer}
+  .tile:hover{outline:1px solid rgba(103,255,243,.2)}
+  .ic{width:54px;height:54px;border-radius:14px;display:grid;place-items:center;background:#0d2b27;color:#9ffdf3;font-size:24px}
+  .nm{font-weight:800}.desc{color:var(--muted);font-size:13px;margin-top:2px}
+  .tag{margin-left:auto;font-size:12px;border:1px solid var(--line);padding:4px 8px;border-radius:999px;color:#9ac6ff}
+  .topbar{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .title{font-weight:800}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:12px; box-shadow:var(--shadow); margin-bottom:12px}
+  .row{display:flex;align-items:center;gap:12px;padding:10px;border-radius:14px;border:1px solid var(--line);background:#0c121d}
+  .col{display:flex;flex-direction:column;gap:8px}
+  .name{font-weight:600; min-width:110px}
+  .slider{width:100%}
+  .toggle{min-width:36px;width:36px;height:36px; border-radius:10px; border:1px solid var(--line); background:#0d1826; color:#eaf0ff; display:grid; place-items:center; font-size:18px; cursor:pointer}
+  .toggle.on{background:linear-gradient(180deg,#18e6d4,#00b3a4); color:#041412; border-color:#0aa497}
+  .btn{appearance:none;border:1px solid var(--line);background:#0f1520;color:#fff;border-radius:12px;padding:8px 12px;cursor:pointer}
+  .btn.primary{background:linear-gradient(180deg,#18e6d4,#00b3a4); color:#041412; border-color:#0aa497}
+  .btn.danger{background:#2a0e14; border-color:#3c1620; color:#ffd9e0}
+  .group{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .label{color:var(--muted);font-size:12px;margin-right:4px}
+  .pill{display:flex;align-items:center;border:1px solid var(--line);background:#0b111b;border-radius:999px;overflow:hidden}
+  .pill button{appearance:none;border:0;background:transparent;color:#fff;width:36px;height:36px;font-size:18px;cursor:pointer}
+  .pill input{width:70px;padding:6px 6px;text-align:center;border:0;outline:none;background:transparent;color:var(--text);font-weight:700}
+  .meter{height:10px;background:#0d1422;border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+  .meter>i{display:block;height:100%;width:0%;background:linear-gradient(90deg, var(--acc), var(--acc2)); transition:width .12s}
+  .note{margin:8px 2px 0; color:var(--muted); font-size:12px}
+  [hidden]{display:none !important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- HOME -->
+  <section id="home">
+    <div class="header">
+      <div class="logo" id="goHome">
+        <div class="bubble">👶</div><div class="title">Baby Sleep+</div>
+      </div>
+      <div class="spacer"></div>
+      <button class="gear" id="goSettings" title="Настройки">⚙️</button>
+    </div>
+
+    <div class="tiles">
+      <div class="tile" id="goNoise">
+        <div class="ic">◻️</div>
+        <div><div class="nm">Белый шум</div><div class="desc">Только из library.json</div></div>
+        <span class="tag">микс</span>
+      </div>
+      <div class="tile" id="goLull">
+        <div class="ic">🎵</div>
+        <div><div class="nm">Колыбельные</div><div class="desc">Список из library.json</div></div>
+        <span class="tag">плейлист</span>
+      </div>
+      <div class="tile" id="goTales">
+        <div class="ic">📖</div>
+        <div><div class="nm">Сказки</div><div class="desc">Старт с 23‑й сек.</div></div>
+        <span class="tag">аудио</span>
+      </div>
+    </div>
+
+    <p class="note">Все разделы читают треки из одного файла <code>library.json</code> рядом с <code>index.html</code>.</p>
+  </section>
+
+  <!-- NOISE -->
+  <section id="noise" hidden>
+    <div class="topbar"><button class="btn" data-back>← Назад</button><div class="title" style="margin-left:8px">Белый шум</div></div>
+
+    <div class="card">
+      <div class="row">
+        <div class="name">Мастер‑громкость</div>
+        <input id="masterVol" type="range" min="0" max="1" step="0.01" value="0.7" class="slider" />
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title" style="margin:0 0 6px 2px">Файлы из library.json → <code>noise[]</code></div>
+      <div id="noiseList" class="col"></div>
+      <p class="note">Состояние микса сохраняется автоматически.</p>
+    </div>
+
+    <div class="card">
+      <div class="title" style="margin:0 0 8px 2px">Таймер</div>
+      <div class="group" style="margin-bottom:10px">
+        <span class="label">Минуты</span>
+        <div class="pill">
+          <button type="button" data-step="-5" data-target="#tmMin">−</button>
+          <input id="tmMin" type="number" min="1" max="600" value="60" inputmode="numeric" />
+          <button type="button" data-step="5" data-target="#tmMin">+</button>
+        </div>
+      </div>
+      <div class="group" style="margin-bottom:10px">
+        <span class="label">Фейд‑аут</span>
+        <div class="pill">
+          <button type="button" data-step="-5" data-target="#tmFade">−</button>
+          <input id="tmFade" type="number" min="5" max="180" value="20" inputmode="numeric" />
+          <button type="button" data-step="5" data-target="#tmFade">+</button>
+        </div>
+      </div>
+      <div class="row">
+        <button id="tmStart" class="btn primary">Старт</button>
+        <button id="tmCancel" class="btn">Отмена</button>
+        <div class="spacer"></div>
+        <div id="tmLabel" style="font-variant-numeric:tabular-nums">00:00:00</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="title" style="margin:0 0 8px 2px">Детектор плача</div>
+      <div class="row" style="margin-bottom:10px">
+        <button id="micStart" class="btn primary">🎙 Включить</button>
+        <button id="micStop" class="btn">Выключить</button>
+        <div class="spacer"></div>
+        <span class="label">Порог</span>
+        <input id="thresh" type="range" min="0.01" max="0.25" step="0.005" value="0.06" class="slider" style="max-width:170px">
+      </div>
+      <div class="group" style="margin-bottom:8px">
+        <span class="label">Удержание (с)</span>
+        <div class="pill">
+          <button type="button" data-step="-1" data-target="#holdSec">−</button>
+          <input id="holdSec" type="number" min="1" max="10" value="2" inputmode="numeric" />
+          <button type="button" data-step="1" data-target="#holdSec">+</button>
+        </div>
+      </div>
+      <div class="group" style="margin-bottom:8px">
+        <span class="label">Пауза (с)</span>
+        <div class="pill">
+          <button type="button" data-step="-5" data-target="#coolSec">−</button>
+          <input id="coolSec" type="number" min="5" max="120" value="15" inputmode="numeric" />
+          <button type="button" data-step="5" data-target="#coolSec">+</button>
+        </div>
+      </div>
+      <div class="meter" style="margin-top:6px"><i id="lvl"></i></div>
+      <p class="note">При превышении порога — краткое увеличение мастер‑громкости и возобновление треков.</p>
+    </div>
+  </section>
+
+  <!-- LULLABIES -->
+  <section id="lull" hidden>
+    <div class="topbar"><button class="btn" data-back>← Назад</button><div class="title" style="margin-left:8px">Колыбельные</div></div>
+    <div class="card"><div id="lullList" class="col"></div></div>
+  </section>
+
+  <!-- TALES -->
+  <section id="tales" hidden>
+    <div class="topbar"><button class="btn" data-back>← Назад</button><div class="title" style="margin-left:8px">Сказки</div></div>
+    <div class="card"><div id="talesList" class="col"></div></div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section id="settings" hidden>
+    <div class="topbar"><button class="btn" data-back>← Назад</button><div class="title" style="margin-left:8px">Настройки</div></div>
+    <div class="card"><div class="row"><div class="name">Версия</div><div>JSON‑only noise + таймер + детектор</div></div></div>
+  </section>
+</div>
+
+<script>
+(()=>{
+  // --- nav
+  const $ = s => document.querySelector(s);
+  const screens = {home:$('#home'), noise:$('#noise'), lull:$('#lull'), tales:$('#tales'), settings:$('#settings')};
+  const show = id => { Object.values(screens).forEach(el=>el.setAttribute('hidden','')); (screens[id]||screens.home).removeAttribute('hidden'); };
+  $('#goHome')?.addEventListener('click', ()=>show('home'));
+  $('#goNoise')?.addEventListener('click', ()=>show('noise'));
+  $('#goLull') ?.addEventListener('click', ()=>show('lull'));
+  $('#goTales')?.addEventListener('click', ()=>show('tales'));
+  $('#goSettings')?.addEventListener('click', ()=>show('settings'));
+  document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click', ()=>show('home')));
+
+  // --- steppers
+  function bindSteppers(){
+    document.querySelectorAll('.pill button[data-step]').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const target = document.querySelector(btn.getAttribute('data-target'));
+        if(!target) return;
+        const step = parseFloat(btn.getAttribute('data-step'))||0;
+        const min = target.min? parseFloat(target.min): -Infinity;
+        const max = target.max? parseFloat(target.max):  Infinity;
+        let v = parseFloat(target.value||'0') + step;
+        v = Math.max(min, Math.min(max, v));
+        target.value = String(v);
+        target.dispatchEvent(new Event('input', {bubbles:true}));
+      });
+    });
+  }
+  bindSteppers();
+
+  // --- helpers
+  function titleFromFilename(path){
+    const name = decodeURIComponent((path.split('/').pop()||''));
+    const base = name.replace(/\.[^.]+$/,'').replace(/[._-]+/g,' ').trim();
+    return base.charAt(0).toUpperCase()+base.slice(1);
+  }
+  function normalize(list){
+    if(!Array.isArray(list)) return [];
+    return list.map(x=>{
+      if(typeof x==='string') return {title:titleFromFilename(x), file:x};
+      const file = x.file || x.url || '';
+      return {title: x.title || titleFromFilename(file), file};
+    });
+  }
+
+  // --- storage (autosave mix)
+  const LS_MIX = 'bs.mix.v1';
+  function saveMix(state){ try{ localStorage.setItem(LS_MIX, JSON.stringify(state)); }catch{} }
+  function loadMix(){ try{ return JSON.parse(localStorage.getItem(LS_MIX)||'{}'); }catch{ return {}; } }
+
+  // --- NOISE (json-only)
+  const masterVolEl = document.getElementById('masterVol');
+  const noiseListEl = document.getElementById('noiseList');
+  const noisePlayers = new Map(); // url -> {audio, vol(0..1), on:bool}
+  function setActualVolume(p){ p.audio.volume = Math.max(0, Math.min(1, (p.vol||0)*parseFloat(masterVolEl.value||'1'))); }
+  function collectMixState(){
+    const obj = {master: parseFloat(masterVolEl.value||'1'), tracks:{}};
+    noisePlayers.forEach((p, url)=>{ obj.tracks[url] = {vol:p.vol||0, on:!!p.on}; });
+    return obj;
+  }
+  function applyMixState(state){
+    if(!state) return;
+    if(typeof state.master === 'number'){
+      masterVolEl.value = String(state.master);
+    }
+    Object.entries(state.tracks||{}).forEach(([url, t])=>{
+      const p = noisePlayers.get(url);
+      if(!p) return;
+      p.vol = typeof t.vol === 'number' ? t.vol : 0;
+      p.on  = !!t.on;
+      setActualVolume(p);
+      const ui = document.querySelector(`[data-url="${CSS.escape(url)}"]`);
+      if(ui){
+        const sl = ui.querySelector('input[type="range"]');
+        const tg = ui.querySelector('.toggle');
+        if(sl) sl.value = String(p.vol);
+        if(tg){ tg.classList.toggle('on', p.on); tg.setAttribute('aria-pressed', p.on?'true':'false'); tg.textContent = p.on ? '✔' : '○'; }
+      }
+      if(p.on && p.vol>0){ p.audio.play().catch(()=>{}); }
+      else { if(p.audio) p.audio.pause(); }
+    });
+  }
+
+  function renderNoise(list){
+    noiseListEl.innerHTML='';
+    const items = normalize(list);
+    items.forEach(it=>{
+      const url = it.file || it.url;
+      let p = noisePlayers.get(url);
+      if(!p){
+        const a = new Audio(url);
+        a.loop = true; a.preload = 'auto';
+        p = {audio:a, vol:0, on:false};
+        noisePlayers.set(url, p);
+      }
+      const row = document.createElement('div');
+      row.className='row';
+      row.setAttribute('data-url', url);
+      row.innerHTML = `<div class="name">${it.title}</div>
+        <div style="margin-left:auto;display:flex;gap:10px;align-items:center">
+          <button class="toggle" aria-pressed="false">○</button>
+          <input type="range" min="0" max="1" step="0.01" value="0" class="slider">
+        </div>`;
+      const tg = row.querySelector('.toggle');
+      const sl = row.querySelector('input[type="range"]');
+      const setToggle=(on)=>{ tg.classList.toggle('on',on); tg.setAttribute('aria-pressed', on?'true':'false'); tg.textContent = on ? '✔' : '○'; };
+
+      tg.addEventListener('click', async ()=>{
+        p.on = !tg.classList.contains('on');
+        setToggle(p.on);
+        if(!p.on){ p.audio.pause(); }
+        if(p.on && p.vol>0){
+          setActualVolume(p);
+          try{ await p.audio.play(); }catch(e){}
+        }
+        saveMix(collectMixState());
+      });
+
+      sl.addEventListener('input', async e=>{
+        p.vol = parseFloat(e.target.value||'0');
+        setActualVolume(p);
+        if(p.vol>0 && !tg.classList.contains('on')){
+          p.on = true; setToggle(true);
+        }
+        if(p.on && p.vol>0){ try{ await p.audio.play(); }catch(e){} }
+        if(p.vol===0 && p.audio){ p.audio.pause(); }
+        saveMix(collectMixState());
+      });
+
+      noiseListEl.appendChild(row);
+    });
+
+    masterVolEl.addEventListener('input', ()=>{
+      noisePlayers.forEach(setActualVolume);
+      saveMix(collectMixState());
+    });
+  }
+
+  // --- Lullabies & Tales (simple play; tales start at 23s)
+  function renderSimpleList(containerId, list, seekStart=0){
+    const box = document.getElementById(containerId);
+    box.innerHTML='';
+    const items = normalize(list);
+    items.forEach((it, i)=>{
+      const row = document.createElement('div');
+      row.className='row';
+      row.innerHTML = `<div class="name">${it.title}</div><div class="spacer"></div><button class="toggle">▶︎</button>`;
+      const btn = row.querySelector('button');
+      let a = null, playing=false;
+      const update = ()=>{ btn.textContent = playing ? '⏸' : '▶︎'; };
+      btn.addEventListener('click', async ()=>{
+        try{
+          if(!a){ a = new Audio(it.file||it.url); a.loop = false; a.addEventListener('loadedmetadata',()=>{ try{ a.currentTime = seekStart; }catch(e){} }, {once:true}); }
+          if(!playing){ await a.play(); playing=true; a.onended=()=>{ playing=false; update(); }; }
+          else { a.pause(); playing=false; }
+          update();
+        }catch(e){ console.warn('play err', e); }
+      });
+      update();
+      box.appendChild(row);
+    });
+  }
+
+  // --- Timer (fade-out -> stop)
+  let tmId=null, tmEnd=0, tmFade=20, tmBaseVol=0.7;
+  const tmMinEl = document.getElementById('tmMin');
+  const tmFadeEl = document.getElementById('tmFade');
+  const tmLabel = document.getElementById('tmLabel');
+  function fmt(sec){ sec=Math.max(0,Math.floor(sec)); const h=String(Math.floor(sec/3600)).padStart(2,'0'); const m=String(Math.floor((sec%3600)/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${h}:${m}:${s}`; }
+  function updTimer(){ if(!tmEnd){ tmLabel.textContent='00:00:00'; return;} const left=Math.max(0,Math.round(tmEnd-Date.now()/1000)); tmLabel.textContent=fmt(left); }
+  setInterval(updTimer, 500);
+  document.getElementById('tmStart').addEventListener('click', ()=>{
+    const m=Math.max(1, parseInt(tmMinEl.value||'0',10));
+    tmFade = Math.min(180, Math.max(5, parseInt(tmFadeEl.value||'20',10)));
+    tmEnd = Math.round(Date.now()/1000) + m*60;
+    tmBaseVol = parseFloat(masterVolEl.value||'0.7');
+    if(tmId) clearInterval(tmId);
+    tmId = setInterval(()=>{
+      const now = Date.now()/1000;
+      const left = tmEnd - now;
+      if(left <= tmFade && left > 0){
+        const k = Math.max(0, left / tmFade);
+        const v = +(tmBaseVol * k).toFixed(3);
+        masterVolEl.value = String(v);
+        noisePlayers.forEach(setActualVolume);
+      }
+      if(left <= 0){
+        clearInterval(tmId); tmId=null; tmEnd=0; updTimer();
+        // stop all
+        masterVolEl.value = "0";
+        noisePlayers.forEach(p=>{ p.vol=0; p.on=false; p.audio.pause(); });
+        document.querySelectorAll('#noiseList .row').forEach(row=>{
+          const tg=row.querySelector('.toggle'); const sl=row.querySelector('input[type="range"]');
+          if(tg){ tg.classList.remove('on'); tg.setAttribute('aria-pressed','false'); tg.textContent='○'; }
+          if(sl){ sl.value='0'; }
+        });
+        noisePlayers.forEach(setActualVolume);
+        saveMix(collectMixState());
+      }
+    }, 250);
+  });
+  document.getElementById('tmCancel').addEventListener('click', ()=>{
+    if(tmId) clearInterval(tmId);
+    tmId=null; tmEnd=0; updTimer();
+    masterVolEl.value = String(tmBaseVol||masterVolEl.value||'0.7');
+    noisePlayers.forEach(setActualVolume);
+    saveMix(collectMixState());
+  });
+
+  // --- Cry Detector (RMS -> boost master)
+  let micStream=null, analyser=null, micOn=false, cryTimer=0, cryArmed=true;
+  const lvlElm = document.getElementById('lvl');
+  const threshEl = document.getElementById('thresh');
+  const holdEl = document.getElementById('holdSec');
+  const coolEl = document.getElementById('coolSec');
+  let audioCtx=null;
+  async function startMic(){
+    try{
+      micStream = await navigator.mediaDevices.getUserMedia({audio:true});
+      audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+      const src = audioCtx.createMediaStreamSource(micStream);
+      analyser = audioCtx.createAnalyser(); analyser.fftSize = 1024;
+      src.connect(analyser);
+      micOn=true; cryTimer=0; cryArmed=true; loopMic();
+    }catch(e){ alert('Нет доступа к микрофону: '+(e&&e.message?e.message:e)); }
+  }
+  function stopMic(){ if(micStream){ micStream.getTracks().forEach(t=>t.stop()); } micStream=null; micOn=false; try{ audioCtx && audioCtx.close(); }catch{} audioCtx=null; }
+  function loopMic(){
+    if(!micOn||!analyser) return;
+    const buf = new Uint8Array(analyser.fftSize);
+    analyser.getByteTimeDomainData(buf);
+    let sum=0; for(let i=0;i<buf.length;i++){ const v=(buf[i]-128)/128; sum+=v*v; }
+    const rms = Math.sqrt(sum/buf.length);
+    if(lvlElm) lvlElm.style.width = Math.min(100, Math.round(rms*400))+'%';
+    const thr = parseFloat(threshEl.value||'0.06');
+    const needHold = parseFloat(holdEl.value||'2');
+    const cool = parseFloat(coolEl.value||'15');
+    if(rms>thr){
+      cryTimer += 0.08;
+      if(cryTimer>needHold && cryArmed){
+        cryArmed=false;
+        // Boost master
+        const cur = parseFloat(masterVolEl.value||'0.7');
+        const mg = Math.min(1, +(cur*1.15).toFixed(2));
+        masterVolEl.value = String(mg);
+        noisePlayers.forEach(p=>{
+          setActualVolume(p);
+          if(p.on && p.vol>0 && p.audio.paused){ p.audio.play().catch(()=>{}); }
+        });
+        setTimeout(()=>{ cryArmed=true; }, cool*1000);
+      }
+    } else {
+      cryTimer = Math.max(0, cryTimer-0.08);
+    }
+    requestAnimationFrame(loopMic);
+  }
+  document.getElementById('micStart').addEventListener('click', startMic);
+  document.getElementById('micStop').addEventListener('click', stopMic);
+
+  // --- load library.json (fetch with XHR fallback)
+  async function loadLibrary(){
+    try{
+      const r = await fetch('library.json', {cache:'no-cache'});
+      if(r.ok) return await r.json();
+    }catch(e){}
+    try{
+      const x = new XMLHttpRequest();
+      x.overrideMimeType && x.overrideMimeType('application/json');
+      x.open('GET','library.json',true);
+      return await new Promise((res,rej)=>{
+        x.onreadystatechange = ()=>{ if(x.readyState===4){ try{ res(JSON.parse(x.responseText||'{}')); }catch(e){ rej(e); } } };
+        x.onerror = rej; x.send();
+      });
+    }catch(e){}
+    return {lullabies:[], tales:[], noise:[]};
+  }
+
+  (async () => {
+    const lib = await loadLibrary();
+    // Render sections
+    renderNoise(lib.noise||[]);
+    const mixState = loadMix();
+    if(typeof mixState.master === 'number'){ masterVolEl.value = String(mixState.master); }
+    // Build players first, then apply saved state (so UI elements exist)
+    applyMixState(mixState);
+    renderSimpleList('lullList',  lib.lullabies||[], 0);
+    renderSimpleList('talesList', lib.tales||[], 23);
+  })();
+})();
+</script>
+</body>
+</html>
