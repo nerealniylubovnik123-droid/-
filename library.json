@@ -5,6 +5,7 @@
       "file": "Chopin-Berceuse.ogg"
     },
     "assets/lullabies/moonlight.mp3"
+    
   ],
   "tales": [
     {
@@ -21,6 +22,10 @@
      {
       "title": "океанский прибой",
       "file": "океанский прибой.ogg"
+    },
+     {
+      "title": "камин",
+      "file": "Campfire_sound_ambience.ogg"
     },
     "assets/noise/forest_night.mp3"
   ]
